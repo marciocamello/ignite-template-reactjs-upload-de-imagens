@@ -23,8 +23,11 @@ import {
   useEffect,
 } from 'react';
 import {
+  DeepRequired,
   FieldError,
+  FieldErrorsImpl,
   FieldValues,
+  Merge,
   UseFormSetError,
   UseFormTrigger,
 } from 'react-hook-form';
@@ -33,7 +36,7 @@ import { api } from '../../services/api';
 
 export interface FileInputProps {
   name: string;
-  error?: FieldError;
+  error?: Merge<FieldError, FieldErrorsImpl<DeepRequired<any>>> | undefined;
   setImageUrl: Dispatch<SetStateAction<string>>;
   localImageUrl: string;
   setLocalImageUrl: Dispatch<SetStateAction<string>>;
@@ -112,8 +115,8 @@ const FileInputBase: ForwardRefRenderFunction<
         if (err?.message === 'Cancelled image upload.') return;
 
         toast({
-          title: 'Falha no envio',
-          description: 'Ocorreu um erro ao realizar o upload da sua imagem.',
+          title: 'Error uploading image',
+          description: 'Please try again later',
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -175,7 +178,7 @@ const FileInputBase: ForwardRefRenderFunction<
                   <CircularProgressLabel>{progress}%</CircularProgressLabel>
                 </CircularProgress>
                 <Text as="span" pt={2} textAlign="center">
-                  Enviando...
+                  Sending...
                 </Text>
               </>
             ) : (
@@ -202,7 +205,7 @@ const FileInputBase: ForwardRefRenderFunction<
                 >
                   <Icon as={FiPlus} w={14} h={14} />
                   <Text as="span" pt={2} textAlign="center">
-                    Adicione sua imagem
+                    Add your image
                   </Text>
                 </Flex>
               </Box>

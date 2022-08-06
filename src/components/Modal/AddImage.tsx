@@ -26,7 +26,7 @@ export function ModalAddImage({
     <Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size="4xl">
       <ModalOverlay />
       <ModalContent bgColor="pGray.900">
-        <ModalHeader fontSize="4xl">Nova imagem</ModalHeader>
+        <ModalHeader fontSize="4xl">New Image</ModalHeader>
 
         <ModalCloseButton />
 

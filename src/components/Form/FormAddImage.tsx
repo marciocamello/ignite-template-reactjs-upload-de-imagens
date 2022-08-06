@@ -16,45 +16,89 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   const [localImageUrl, setLocalImageUrl] = useState('');
   const toast = useToast();
 
+  const acceptedTypes =
+    /(?:([^:/?#]+):)?(?:([^/?#]*))?([^?#](?:jpeg|gif|png))(?:\?([^#]*))?(?:#(.*))?/g;
+
   const formValidations = {
     image: {
-      // TODO REQUIRED, LESS THAN 10 MB AND ACCEPTED FORMATS VALIDATIONS
+      required: 'Please select an image',
+      validate: {
+        lessThan10MB: (files: FileList) =>
+          files[0].size < 10000000 || 'File size must be less than 10MB',
+        acceptedFormats: (files: FileList) =>
+          acceptedTypes.test(files[0].type) || 'File must be an image',
+      },
     },
     title: {
-      // TODO REQUIRED, MIN AND MAX LENGTH VALIDATIONS
+      required: 'Please enter a title',
+      minLength: {
+        value: 3,
+        message: 'Title must be at least 3 characters',
+      },
+      maxLength: {
+        value: 50,
+        message: 'Title must be less than 50 characters',
+      },
     },
     description: {
-      // TODO REQUIRED, MAX LENGTH VALIDATIONS
+      required: {
+        value: true,
+        message: 'Please enter a description',
+      },
+      maxLength: {
+        value: 65,
+        message: 'Description must be less than 65 characters',
+      },
     },
   };
 
   const queryClient = useQueryClient();
   const mutation = useMutation(
-    // TODO MUTATION API POST REQUEST,
+    async (image: NewImageData) => {
+      await api.post('/api/images', {
+        ...image,
+        url: imageUrl,
+      });
+    },
     {
-      // TODO ONSUCCESS MUTATION
+      onSuccess: () => {
+        queryClient.invalidateQueries('images');
+      },
     }
   );
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState,
-    setError,
-    trigger,
-  } = useForm();
+  const { register, handleSubmit, reset, formState, setError, trigger } =
+    useForm();
   const { errors } = formState;
 
-  const onSubmit = async (data: Record<string, unknown>): Promise<void> => {
+  const onSubmit = async (data: NewImageData): Promise<void> => {
     try {
-      // TODO SHOW ERROR TOAST IF IMAGE URL DOES NOT EXISTS
-      // TODO EXECUTE ASYNC MUTATION
-      // TODO SHOW SUCCESS TOAST
+      if (!imageUrl) {
+        toast({
+          status: 'error',
+          title: 'Image not added',
+          description:
+            'Please select an image before submitting the form or try again later',
+        });
+        return;
+      }
+      await mutation.mutateAsync(data);
+      toast({
+        title: 'No images added',
+        description: 'Your image has been uploaded',
+        status: 'success',
+      });
     } catch {
-      // TODO SHOW ERROR TOAST IF SUBMIT FAILED
+      toast({
+        title: 'Error adding image',
+        description: 'Something went wrong, please try again later',
+        status: 'error',
+      });
     } finally {
-      // TODO CLEAN FORM, STATES AND CLOSE MODAL
+      reset();
+      setImageUrl('');
+      setLocalImageUrl('');
+      closeModal();
     }
   };
 
@@ -67,20 +111,20 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           setLocalImageUrl={setLocalImageUrl}
           setError={setError}
           trigger={trigger}
-          // TODO SEND IMAGE ERRORS
-          // TODO REGISTER IMAGE INPUT WITH VALIDATIONS
+          {...register('image', formValidations.image)}
+          error={errors.image}
         />
 
         <TextInput
-          placeholder="Título da imagem..."
-          // TODO SEND TITLE ERRORS
-          // TODO REGISTER TITLE INPUT WITH VALIDATIONS
+          placeholder="Image title..."
+          {...register('title', formValidations.title)}
+          error={errors.title}
         />
 
         <TextInput
-          placeholder="Descrição da imagem..."
-          // TODO SEND DESCRIPTION ERRORS
-          // TODO REGISTER DESCRIPTION INPUT WITH VALIDATIONS
+          placeholder="Image description..."
+          {...register('description', formValidations.description)}
+          error={errors.description}
         />
       </Stack>
 
@@ -92,7 +136,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         w="100%"
         py={6}
       >
-        Enviar
+        Send
       </Button>
     </Box>
   );

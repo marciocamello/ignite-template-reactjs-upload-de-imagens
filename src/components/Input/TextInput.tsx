@@ -1,5 +1,10 @@
 import { forwardRef, ForwardRefRenderFunction } from 'react';
-import { FieldError } from 'react-hook-form';
+import {
+  DeepRequired,
+  FieldError,
+  FieldErrorsImpl,
+  Merge,
+} from 'react-hook-form';
 import {
   FormControl,
   FormErrorMessage,
@@ -12,7 +17,7 @@ import { FiAlertCircle } from 'react-icons/fi';
 
 interface InputProps extends ChakraInputProps {
   name: string;
-  error?: FieldError;
+  error?: Merge<FieldError, FieldErrorsImpl<DeepRequired<any>>> | undefined;
 }
 
 const TextInputBase: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
