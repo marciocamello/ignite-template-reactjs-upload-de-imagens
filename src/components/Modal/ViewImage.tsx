@@ -38,7 +38,7 @@ export function ModalViewImage({
         </ModalBody>
         <ModalFooter bg="pGray.800" h="2rem" py="20px" borderBottomRadius="5px">
           <Link href={imgUrl} isExternal fontSize="1rem" mr="auto">
-            Open original image
+            Abrir original
           </Link>
         </ModalFooter>
       </ModalContent>

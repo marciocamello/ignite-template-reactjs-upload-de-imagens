@@ -1,9 +1,9 @@
-import { Grid, useDisclosure } from '@chakra-ui/react';
+import { SimpleGrid, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Card } from './Card';
 import { ModalViewImage } from './Modal/ViewImage';
 
-export interface Card {
+interface Card {
   title: string;
   description: string;
   url: string;
@@ -27,17 +27,16 @@ export function CardList({ cards }: CardsProps): JSX.Element {
 
   return (
     <>
-      <Grid templateColumns="repeat(3, 1fr)" gap="40px">
-        {cards.map(card => {
-          // eslint-disable-next-line react/jsx-no-bind
-          return <Card data={card} key={card.id} viewImage={handleViewImage} />;
-        })}
-      </Grid>
+      <SimpleGrid columns={[1, 2, 3]} spacing="40px">
+        {cards.map(card => (
+          <Card key={card.id} data={card} viewImage={handleViewImage} />
+        ))}
+      </SimpleGrid>
 
       <ModalViewImage
         isOpen={isOpen}
-        onClose={onClose}
         imgUrl={currentImageUrl}
+        onClose={onClose}
       />
     </>
   );
